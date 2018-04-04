@@ -18,3 +18,25 @@ class GoodsListView(BaseView,MuitlObjectReturned):
         context = {'category_id':self.category_id,'categorys':self.category_objects}
         context.update(self.get_objects(page_num))
         return  context
+
+class GoodsDetailsView(BaseView):
+    template_name = 'details.html'
+
+    def handle_request_cookie(self,request):
+        #获得cookie,
+        # 获得cookie
+        self.historys = eval(request.COOKIES.get('historys','[]'))
+        pass
+    def handle_response_cookie(self,response):
+        # 填写用户浏览商品[id,id,id,]
+        if self.goodsId not  in self.historys:
+            self.historys.append(self.goodsId)
+        response.set_cookie('historys',str(self.historys))
+    def get_extra_context(self, request):
+        goodsId = int(request.GET.get('goodsid'))
+        self.goodsId = goodsId
+        good = Goods.objects.get(id = goodsId)
+        recomand_goods=[]
+        for id in self.historys:
+            recomand_goods.append(Goods.objects.get(id = id))
+        return {'good':good,'goods_details':good.goodsdetails_set.all(),'recomand_goods':recomand_goods[:4]}

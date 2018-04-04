@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-from django.conf.global_settings import STATICFILES_DIRS, MEDIA_ROOT, MEDIA_URL
+from django.conf.global_settings import STATICFILES_DIRS, MEDIA_ROOT, MEDIA_URL, SESSION_ENGINE, \
+    SESSION_SAVE_EVERY_REQUEST, CACHES, SESSION_CACHE_ALIAS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,7 +28,7 @@ SECRET_KEY = 'zt!9*&*ui20e@)petrx(!-4b+!4tx2(@tw@=#%5b_wo^pjrq^('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,17 +40,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'goods'
+    'goods',
+    'cart',
+    'User',
+    'order'
 ]
-
+from django.middleware.common import CommonMiddleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'jiukuaijiy.middleware.UserAuth',
 ]
 
 ROOT_URLCONF = 'jiukuaijiy.urls'
@@ -67,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'jiukuaijiy.context_processors.user'
             ],
         },
     },
@@ -83,7 +89,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'jiukuaijiu',
         'USER':"root",
-        'PASSWORD':'admin',
+        'PASSWORD':'root',
         'HOST':'127.0.0.1',
         'PORT':3306
     }
@@ -132,3 +138,25 @@ STATICFILES_DIRS=[
 ]
 MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
 MEDIA_URL='/media/'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
+    "session_default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+# from  django.contrib.sessions.backends.cache import
+SESSION_ENGINE='django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS='session_default'
+
+# curl -d "account=admin&password=e62561b0350976b8c5593362f2f826c5&time=1511159484959" "http://127.0.0.1:8000/user/logincontrol/"
+
+AUTH=[
+    '/user/usercenter/',
+    '/user/useraddress/'
+]

@@ -18,6 +18,9 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('goods.urls')),
+    url(r'^cart/', include('cart.urls')),
+    url(r'^user/', include('User.urls')),
+    url(r'^order/', include('order.urls')),
 ]
 from  jiukuaijiy import settings
 if settings.DEBUG:

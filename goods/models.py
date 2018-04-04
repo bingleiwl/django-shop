@@ -25,13 +25,30 @@ class Goods(models.Model):
     categoryid = models.ForeignKey(Category, models.DO_NOTHING, db_column='categoryId_id')  # Field name made lowercase.
     def img(self):
         return self.store_set.first().color.value
+    def colors(self):
+        stores = self.store_set.all()
+        colors=[]
+        for store in stores:
+            color = store.color
+            if color not in colors:
+                colors.append(color)
+        return colors
+    def sizes(self):
+        stores = self.store_set.all()
+        sizes=[]
+        for store in stores:
+            raw_sizes = store.size.all()
+            for size in raw_sizes:
+              if size not in sizes:
+                    sizes.append(size)
+        return  sizes
     class Meta:
         managed = False
         db_table = 'shop_goods'
         ordering=['-id']
-
+#
 class Goodsdetails(models.Model):
-    value = models.CharField(max_length=100)
+    value = models.ImageField()
     goodsid = models.ForeignKey(Goods, models.DO_NOTHING, db_column='goodsId_id')  # Field name made lowercase.
 
     class Meta:
@@ -58,7 +75,7 @@ class Size(models.Model):
 class Store(models.Model):
     count = models.PositiveIntegerField()
     color=models.ForeignKey(Color)
-    size=models.ManyToManyField(Size)
+    size=models.ManyToManyField(Size)  # 多对多
     goods=models.ForeignKey(Goods)
     def __str__(self):
         return self.goods.gname.encode("UTF-8")
